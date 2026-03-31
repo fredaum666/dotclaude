@@ -13,8 +13,8 @@ elif git rev-parse --git-dir >/dev/null 2>&1; then
   CONTEXT="HEAD: detached at $SHORT_SHA"
 fi
 
-# Last commit
-LAST_COMMIT=$(git log --oneline -1 2>/dev/null)
+# Last commit — sanitize to strip non-printable chars and pipe characters (commit messages are user-controlled)
+LAST_COMMIT=$(git log --oneline -1 2>/dev/null | tr -d '\000-\011\013-\037\177' | tr '|' '-')
 if [ -n "$LAST_COMMIT" ]; then
   CONTEXT="$CONTEXT | Last commit: $LAST_COMMIT"
 fi

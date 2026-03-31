@@ -3,9 +3,10 @@
 # Used as a PreToolUse hook for Edit|Write operations.
 # Exit 2 = block. Exit 0 = allow.
 
-# Requires jq for JSON parsing — allow if missing (don't block the user)
+# Requires jq for JSON parsing — fail closed if missing
 if ! command -v jq >/dev/null 2>&1; then
-  exit 0
+  echo "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"jq is required for secret scanning but is not installed.\"}}"
+  exit 2
 fi
 
 INPUT=$(cat)
@@ -69,6 +70,21 @@ fi
 if echo "$CONTENT" | grep -qiE '(password|secret|token|api_key|apikey|api_secret)[[:space:]]*[=:][[:space:]]*["\x27][^"\x27]{8,}["\x27]' && \
    ! echo "$CONTENT" | grep -qiE '(password|secret|token|api_key|apikey|api_secret)[[:space:]]*[=:][[:space:]]*["\x27]?(process\.env|os\.environ|getenv|\$\{|ENV\[|env\()'; then
   MATCHES="$MATCHES hardcoded credential;"
+fi
+
+# GCP service account keys
+if echo "$CONTENT" | grep -qE '"type"[[:space:]]*:[[:space:]]*"service_account"'; then
+  MATCHES="$MATCHES GCP service account key;"
+fi
+
+# Azure storage connection strings
+if echo "$CONTENT" | grep -qiE 'DefaultEndpointsProtocol=(http|https);AccountName='; then
+  MATCHES="$MATCHES Azure connection string;"
+fi
+
+# Hugging Face tokens
+if echo "$CONTENT" | grep -qE 'hf_[a-zA-Z0-9]{20,}'; then
+  MATCHES="$MATCHES Hugging Face token;"
 fi
 
 if [ -n "$MATCHES" ]; then

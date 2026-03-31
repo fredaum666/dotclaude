@@ -4,8 +4,20 @@ description: Emergency production fix — create hotfix branch, minimal change, 
 argument-hint: "[issue number, error message, or description of production problem]"
 disable-model-invocation: true
 allowed-tools:
-  - Bash(git *)
-  - Bash(gh *)
+  - Bash(git status)
+  - Bash(git diff *)
+  - Bash(git log *)
+  - Bash(git branch *)
+  - Bash(git stash *)
+  - Bash(git add *)
+  - Bash(git commit *)
+  - Bash(git checkout *)
+  - Bash(git switch *)
+  - Bash(git fetch *)
+  - Bash(git push -u origin hotfix/*)
+  - Bash(git remote *)
+  - Bash(gh pr *)
+  - Bash(gh issue *)
   - Bash(npm run test *)
   - Bash(npm run build)
   - Read

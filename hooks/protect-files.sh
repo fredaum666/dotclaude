@@ -70,7 +70,7 @@ case "$FILE_PATH" in
     ;;
   .claude/settings.json|*/.claude/settings.json)
     echo "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"Editing settings.json — this controls permissions and hooks. Confirm this change.\"}}"
-    exit 2
+    exit 1
     ;;
 esac
 

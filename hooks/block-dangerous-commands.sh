@@ -17,7 +17,9 @@ if [ -z "$COMMAND" ]; then
 fi
 
 deny() {
-  echo "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$1\"}}"
+  local reason
+  reason=$(jq -n --arg r "$1" '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":$r}}')
+  echo "$reason"
   exit 2
 }
 
@@ -28,13 +30,14 @@ deny() {
 # Check if the command contains git push (handles chaining with &&, ;, |, subshells)
 if echo "$COMMAND" | grep -qE '(^|[;&|()]+[[:space:]]*)git[[:space:]]+push'; then
 
-  # Block push to main or master
-  if echo "$COMMAND" | grep -qE 'git[[:space:]]+push.*(origin[[:space:]]+|:)(main|master)\b'; then
+  # Block push to main or master (covers: origin main, origin HEAD:main, origin refs/heads/main, origin main:main)
+  if echo "$COMMAND" | grep -qE 'git[[:space:]]+push[[:space:]].*([[:space:]]|:)(main|master)(\b|$)'; then
     deny "Blocked: cannot push directly to main/master. Use a feature branch and create a PR."
   fi
 
-  # Block bare "git push" when on main/master
-  if echo "$COMMAND" | grep -qE 'git[[:space:]]+push[[:space:]]*($|[;&|])'; then
+  # Block bare "git push" or "git push <remote>" (no explicit branch) when on main/master
+  # Covers: git push, git push origin, git push upstream — but NOT git push origin feature-branch
+  if echo "$COMMAND" | grep -qE 'git[[:space:]]+push([[:space:]]+[a-zA-Z0-9_.-]+)?[[:space:]]*($|[;&|])'; then
     CURRENT_BRANCH=$(git branch --show-current 2>/dev/null)
     if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
       deny "Blocked: you are on $CURRENT_BRANCH. Use a feature branch and create a PR."
@@ -51,14 +54,20 @@ fi
 # Destructive filesystem operations
 # ──────────────────────────────────────────────
 
-# Block rm -rf on root, home, or broad paths
-if echo "$COMMAND" | grep -qE 'rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f[[:space:]]+(\/|~|\$HOME|\.\.\/\.\.)'; then
-  deny "Blocked: recursive force-delete on root/home/parent paths. Specify a safe target directory."
-fi
-
-# Block rm -rf / or rm -rf /* or rm -rf ~
-if echo "$COMMAND" | grep -qE 'rm[[:space:]]+-[a-zA-Z]*r.*[[:space:]]+(\/[[:space:]]|\/\*|\/$|~\/?\*?[[:space:]]|~\/?\*?$)'; then
-  deny "Blocked: recursive delete targeting root or home directory."
+# Block rm targeting root, home, or parent paths — covers:
+#   rm -rf /, rm -fr ~, rm -r -f /, rm --recursive --force /, rm -rf -- /path
+# Strategy: if the command contains rm AND (recursive flag) AND (force flag) AND a dangerous target,
+# or if it targets / or ~ in any rm invocation regardless of flags (belt-and-suspenders).
+if echo "$COMMAND" | grep -qE '\brm\b'; then
+  # Long-form or short-form recursive+force targeting dangerous paths
+  if echo "$COMMAND" | grep -qE '\brm\b.*(-[a-zA-Z]*r[a-zA-Z]*f|-[a-zA-Z]*f[a-zA-Z]*r|--recursive|--force|-r[[:space:]]+-f|-f[[:space:]]+-r)' && \
+     echo "$COMMAND" | grep -qE '(\/[[:space:]]|\/\*|\/\s*$|~[\/\*[:space:]]|~$|\$HOME[\/[:space:]]|\$HOME$|\.\.\/)'; then
+    deny "Blocked: recursive force-delete on root/home/parent paths. Specify a safe target directory."
+  fi
+  # Belt-and-suspenders: any rm on / or ~ regardless of flags
+  if echo "$COMMAND" | grep -qE '\brm\b.*[[:space:]](\/[[:space:]]|\/\*|\/\s*$|~[\/\*]?[[:space:]]|~[\/\*]?$)'; then
+    deny "Blocked: rm targeting root or home directory is not allowed."
+  fi
 fi
 
 # ──────────────────────────────────────────────
@@ -89,9 +98,15 @@ if echo "$COMMAND" | grep -qE 'chmod[[:space:]]+777'; then
   deny "Blocked: chmod 777 gives everyone read/write/execute. Use more restrictive permissions (e.g., 755 or 644)."
 fi
 
-# Block piping curl/wget to shell execution
-if echo "$COMMAND" | grep -qE '(curl|wget)[[:space:]].*\|[[:space:]]*(bash|sh|zsh|sudo)'; then
-  deny "Blocked: piping downloaded content directly to a shell is dangerous. Download first, inspect, then execute."
+# Block piping curl/wget directly to a shell or interpreter
+if echo "$COMMAND" | grep -qE '(curl|wget)[[:space:]].*\|[[:space:]]*(bash|sh|zsh|fish|dash|python[23]?|perl|ruby|node|nodejs|sudo)'; then
+  deny "Blocked: piping downloaded content directly to an interpreter is dangerous. Download first, inspect, then execute."
+fi
+
+# Block download-then-execute pattern: curl/wget -o <file> && <shell> <file>
+if echo "$COMMAND" | grep -qE '(curl|wget)[[:space:]].*-[oO][[:space:]]' && \
+   echo "$COMMAND" | grep -qE '(&&|;)[[:space:]]*(bash|sh|zsh|fish|dash|python[23]?|perl|ruby|node|nodejs|sudo|source|\.)'; then
+  deny "Blocked: downloading a file then executing it is dangerous. Inspect the downloaded content before running."
 fi
 
 # Block disk/partition destructive commands
