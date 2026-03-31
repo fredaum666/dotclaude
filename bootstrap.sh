@@ -4,11 +4,11 @@
 #   Clone mode — run from a non-git or empty directory: creates a new project folder
 #   Init mode  — run from inside an existing git repo: adds .claude/ config to it
 # Usage: bash bootstrap.sh
-#        curl -fsSL https://raw.githubusercontent.com/poshan0126/dotclaude/main/bootstrap.sh | bash
+#        curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh | bash
 
 set -euo pipefail
 
-DOTCLAUDE_REPO="https://github.com/poshan0126/dotclaude.git"
+DOTCLAUDE_REPO="https://github.com/fredaum666/dotclaude.git"
 UPSTREAM_REMOTE="upstream"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

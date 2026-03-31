@@ -32,7 +32,7 @@ fi
 if ! git remote get-url "$UPSTREAM_REMOTE" >/dev/null 2>&1; then
   echo "Error: no '$UPSTREAM_REMOTE' remote found." >&2
   echo "Set it with:" >&2
-  echo "  git remote add upstream https://github.com/poshan0126/dotclaude.git" >&2
+  echo "  git remote add upstream https://github.com/fredaum666/dotclaude.git" >&2
   exit 1
 fi
 

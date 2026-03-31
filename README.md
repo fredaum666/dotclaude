@@ -6,13 +6,13 @@ The standard `.claude/` folder structure for everyday development.
 
 **New project:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/poshan0126/dotclaude/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh | bash
 ```
 
 **Existing project:**
 ```bash
 cd your-existing-project
-curl -fsSL https://raw.githubusercontent.com/poshan0126/dotclaude/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh | bash
 ```
 
 Bootstrap detects the context, sets everything up, and tells you what to do next.
@@ -52,7 +52,7 @@ gh auth login
 
 ```bash
 # Clone dotclaude anywhere and run bootstrap
-git clone https://github.com/poshan0126/dotclaude.git
+git clone https://github.com/fredaum666/dotclaude.git
 cd dotclaude
 bash bootstrap.sh
 ```
