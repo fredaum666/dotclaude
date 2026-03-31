@@ -2,6 +2,23 @@
 
 The standard `.claude/` folder structure for everyday development.
 
+## Quick Start
+
+**New project:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/poshan0126/dotclaude/main/bootstrap.sh | bash
+```
+
+**Existing project:**
+```bash
+cd your-existing-project
+curl -fsSL https://raw.githubusercontent.com/poshan0126/dotclaude/main/bootstrap.sh | bash
+```
+
+Bootstrap detects the context, sets everything up, and tells you what to do next.
+
+> **Prerequisite:** `git`, `jq`, and optionally `gh` (GitHub CLI). See [Getting Started](#getting-started) for install commands.
+
 ## Why This Exists
 
 Plugins consume hundreds of tokens per turn and are designed for specific workflows like scaffolding entire projects. But day-to-day, you're fixing bugs, adding features, reviewing code, and writing tests — not building products from scratch.
@@ -10,51 +27,82 @@ This repo provides a lean, token-efficient `.claude/` configuration optimized fo
 
 ## Getting Started
 
-### 1. Copy everything into your project
+### Prerequisites
 
 ```bash
-git clone https://github.com/poshan0126/dotclaude.git /tmp/dotclaude
+# macOS
+brew install git jq gh
 
-cd your-project
-mkdir -p .claude
-
-# Copy config files
-cp /tmp/dotclaude/settings.json .claude/
-cp -r /tmp/dotclaude/{rules,skills,agents,hooks} .claude/
-cp /tmp/dotclaude/.gitignore .claude/
-cp /tmp/dotclaude/CLAUDE.md ./
-cp /tmp/dotclaude/CLAUDE.local.md.example ./
-
-chmod +x .claude/hooks/*.sh
-rm -rf /tmp/dotclaude
-
-# Add CLAUDE.local.md to your project root .gitignore
-echo "CLAUDE.local.md" >> .gitignore
+# Linux (Debian/Ubuntu)
+sudo apt install git jq && \
+  (type -p curl >/dev/null || sudo apt install curl) && \
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
+  sudo apt update && sudo apt install gh
 ```
 
-### 2. Reload Claude Code
+Then authenticate with GitHub:
+```bash
+gh auth login
+```
 
-If you already have a Claude Code session open, **exit and restart it**. Skills, agents, and rules are loaded at session start — a running session won't see the new files.
+---
 
-### 3. Run `/setupdotclaude`
+### New project
 
+```bash
+# Clone dotclaude anywhere and run bootstrap
+git clone https://github.com/poshan0126/dotclaude.git
+cd dotclaude
+bash bootstrap.sh
+```
+
+Bootstrap will:
+1. Ask for your project name
+2. Create the project folder with `.claude/` config already committed
+3. Ask whether to create a new GitHub repo or connect an existing one
+4. Set `upstream` → dotclaude (for future config updates) and `origin` → your project repo
+5. Push the initial commit
+
+Then open the project in Claude Code and — **once you've added your first code** — run:
 ```
 /setupdotclaude
 ```
 
-This will:
-- Clean up README files that waste tokens
-- Scan your codebase (tech stack, test framework, linters, folder structure)
-- Customize `CLAUDE.md` with your actual build/test/lint commands
-- Update `settings.json` permissions for your package manager
-- Adjust rule paths to match your real directories
-- Auto-detect and enable your project's formatter (Prettier, Biome, Ruff, Black, rustfmt, gofmt)
-- Remove config that doesn't apply (e.g., frontend rules if you have no frontend)
-- Run a final review pass against your full codebase
+This scans your stack and tailors every config file to match your actual tech, commands, and conventions. Every change is confirmed before it's applied.
 
-Every change is confirmed with you before it's applied.
+---
 
-> If you skip `/setupdotclaude`, delete the `README.md` files inside `.claude/` subdirectories — they're for GitHub browsing only and waste tokens at runtime.
+### Existing project
+
+Run bootstrap inside your existing project folder:
+
+```bash
+cd your-existing-project
+bash /path/to/dotclaude/bootstrap.sh
+```
+
+Bootstrap will detect you're inside a git repo and run in **init mode**:
+1. Copy `.claude/` config into your project (skips files already present)
+2. Set `upstream` → dotclaude
+3. Ask whether to connect a GitHub remote
+4. Commit the config alongside your existing code
+
+Then open Claude Code and run `/setupdotclaude` to adapt the config to what you've already built.
+
+---
+
+### Pull config updates from dotclaude
+
+When security fixes or new features land in dotclaude, propagate them to any project:
+
+```bash
+bash update.sh
+```
+
+This fetches and merges only `.claude/`, `bootstrap.sh`, and `update.sh` from `upstream`. Review the diff, then commit if everything looks good.
+
+---
 
 ### Troubleshooting
 
@@ -62,23 +110,26 @@ Every change is confirmed with you before it's applied.
 |---------|-----|
 | Skills or agents not showing up | **Restart Claude Code** — skills/agents/rules are loaded at session start |
 | Hooks not running | Run `chmod +x .claude/hooks/*.sh` and verify `jq` is installed |
-| "jq not found" blocking everything | Install jq: `brew install jq` (macOS) or `apt install jq` (Linux) |
-| format-on-save not formatting | Ensure the formatter binary is installed locally and its config file exists in the project root |
-| Permission denied on allowed commands | Check glob syntax in `settings.json` — `Bash(npm run test *)` means the `*` matches arguments after `test` |
-| `/setupdotclaude` asks to confirm settings.json edits | This is expected — `protect-files.sh` prompts for confirmation when editing `settings.json` (hook scripts remain hard-blocked) |
+| "jq not found" blocking everything | `brew install jq` (macOS) or `apt install jq` (Linux) |
+| format-on-save not formatting | Ensure the formatter binary is installed and its config file exists in the project root |
+| Permission denied on allowed commands | Check glob syntax in `settings.json` — `Bash(npm run test *)` means `*` matches arguments after `test` |
+| `/setupdotclaude` asks to confirm settings.json edits | Expected — `protect-files.sh` prompts before editing `settings.json` (hook scripts are hard-blocked) |
+| `upstream` remote already exists | Run `git remote set-url upstream <dotclaude-url>` to update it manually |
 
-### 4. Make it yours
+---
 
-`/setupdotclaude` gets you 90% of the way. To give it your unique touch:
+### Make it yours
 
-- **`rules/code-quality.md`** — update naming conventions to match your team's style. Tweak the comment guidelines, code marker format, and import order.
-- **`rules/frontend.md`** — pick your design principle. Highlight which component framework your project uses.
-- **`rules/security.md`** — add paths specific to your project's sensitive areas beyond the defaults.
-- **`CLAUDE.md`** — add architectural decisions, domain knowledge, and workflow quirks unique to your project.
-- **`CLAUDE.local.md`** — rename the `.example` file for personal preferences (gitignored).
-- **`hooks/format-on-save.sh`** — if `/setupdotclaude` didn't detect your formatter, uncomment the right section manually.
+`/setupdotclaude` gets you 90% of the way. To fine-tune:
 
-The defaults are solid foundations. Your edits on top are what make Claude truly effective for *your* project.
+- **`rules/code-quality.md`** — naming conventions, comment style, code markers
+- **`rules/frontend.md`** — design principle, component framework
+- **`rules/security.md`** — sensitive paths specific to your project
+- **`CLAUDE.md`** — architectural decisions, domain knowledge, workflow quirks
+- **`CLAUDE.local.md`** — rename the `.example` file for personal preferences (gitignored)
+- **`hooks/format-on-save.sh`** — uncomment your formatter if auto-detect missed it
+
+The defaults are solid foundations. Your edits on top are what make Claude effective for *your* project.
 
 ## Skills (Slash Commands)
 
