@@ -6,17 +6,19 @@ The standard `.claude/` folder structure for everyday development.
 
 **New project:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh -o bootstrap.sh && bash bootstrap.sh
 ```
 
 **Existing project:**
 ```bash
 cd your-existing-project
-curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh -o bootstrap.sh && bash bootstrap.sh
 ```
 
 Bootstrap detects the context, sets everything up, and tells you what to do next.
 
+> **Note:** Download first, then run — piping directly with `curl | bash` breaks the interactive prompts.
+>
 > **Prerequisite:** `git`, `jq`, and optionally `gh` (GitHub CLI). See [Getting Started](#getting-started) for install commands.
 
 ## Why This Exists
@@ -51,10 +53,7 @@ gh auth login
 ### New project
 
 ```bash
-# Clone dotclaude anywhere and run bootstrap
-git clone https://github.com/fredaum666/dotclaude.git
-cd dotclaude
-bash bootstrap.sh
+curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh -o bootstrap.sh && bash bootstrap.sh
 ```
 
 Bootstrap will:
@@ -79,7 +78,7 @@ Run bootstrap inside your existing project folder:
 
 ```bash
 cd your-existing-project
-bash /path/to/dotclaude/bootstrap.sh
+curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh -o bootstrap.sh && bash bootstrap.sh
 ```
 
 Bootstrap will detect you're inside a git repo and run in **init mode**:
