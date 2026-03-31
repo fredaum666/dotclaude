@@ -110,8 +110,12 @@ if echo "$COMMAND" | grep -qE '(curl|wget)[[:space:]].*-[oO][[:space:]]' && \
 fi
 
 # Block disk/partition destructive commands
-if echo "$COMMAND" | grep -qE '(mkfs|dd[[:space:]]+if=|>[[:space:]]*/dev/)'; then
+# Note: exclude >/dev/null (common redirect) — only block writes to real devices like /dev/sda
+if echo "$COMMAND" | grep -qE '(mkfs|dd[[:space:]]+if=)'; then
   deny "Blocked: destructive disk operation detected. This can cause irreversible data loss."
+fi
+if echo "$COMMAND" | grep -qE '>[[:space:]]*/dev/[a-z]+[0-9]'; then
+  deny "Blocked: writing directly to a disk device. This can cause irreversible data loss."
 fi
 
 # ──────────────────────────────────────────────
