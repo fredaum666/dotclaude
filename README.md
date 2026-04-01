@@ -21,6 +21,19 @@ Bootstrap detects the context, sets everything up, and tells you what to do next
 >
 > **Prerequisite:** `git`, `jq`, and optionally `gh` (GitHub CLI). See [Getting Started](#getting-started) for install commands.
 
+### Recommended: Install the Superpowers plugin
+
+Superpowers is a global Claude Code plugin that adds structured workflows for planning, debugging, TDD, code review, and more. Install it once and it works across all your projects:
+
+```bash
+claude mcp add superpowers -- npx -y claude-superpowers@latest
+```
+
+Then in any Claude Code session:
+```
+/using-superpowers
+```
+
 ## Why This Exists
 
 Plugins consume hundreds of tokens per turn and are designed for specific workflows like scaffolding entire projects. But day-to-day, you're fixing bugs, adding features, reviewing code, and writing tests — not building products from scratch.

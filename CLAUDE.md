@@ -43,6 +43,8 @@ npm run dev              # start dev server
 - Run typecheck after making a series of code changes
 - Prefer fixing the root cause over adding workarounds
 - When unsure about approach, use plan mode (`Shift+Tab`) before coding
+- Use superpowers skills for structured workflows: `/brainstorming` before new features, `/tdd` for test-driven work, `/systematic-debugging` for bugs, `/writing-plans` before complex tasks
+- Install superpowers globally if not present: `claude mcp add superpowers -- npx -y claude-superpowers@latest`
 
 ## Don'ts
 
