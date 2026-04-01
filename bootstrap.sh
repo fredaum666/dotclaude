@@ -242,6 +242,22 @@ fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 
+# ── Superpowers plugin ───────────────────────────────────────────────────────
+
+if command -v claude >/dev/null 2>&1; then
+  if ! claude mcp list 2>/dev/null | grep -q "superpowers"; then
+    echo ""
+    info "Installing superpowers plugin..."
+    if claude mcp add superpowers -- npx -y claude-superpowers@latest 2>/dev/null; then
+      success "Superpowers plugin installed"
+    else
+      warn "Superpowers install failed — run manually: claude mcp add superpowers -- npx -y claude-superpowers@latest"
+    fi
+  else
+    info "Superpowers plugin already installed — skipping"
+  fi
+fi
+
 echo ""
 echo "────────────────────────────────────────────"
 success "Bootstrap complete!"
