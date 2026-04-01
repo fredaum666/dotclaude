@@ -245,56 +245,59 @@ fi
 # ── Plugins ───────────────────────────────────────────────────────────────────
 
 if command -v claude >/dev/null 2>&1; then
+  PLUGIN_LIST=$(claude plugin list 2>/dev/null || true)
+  MCP_LIST=$(claude mcp list 2>/dev/null || true)
+
   # Superpowers — structured workflows (brainstorming, TDD, debugging, planning)
-  if ! claude mcp list 2>/dev/null | grep -q "superpowers"; then
+  if ! echo "$MCP_LIST" | grep -q "superpowers"; then
     echo ""
     info "Installing superpowers plugin..."
-    if claude mcp add superpowers -- npx -y claude-superpowers@latest 2>/dev/null; then
+    if claude mcp add superpowers --yes -- npx -y claude-superpowers@latest 2>/dev/null; then
       success "Superpowers plugin installed"
     else
       warn "Superpowers install failed — run manually: claude mcp add superpowers -- npx -y claude-superpowers@latest"
     fi
   else
-    info "Superpowers plugin already installed — skipping"
+    info "Superpowers already installed — skipping"
   fi
 
   # Frontend-design — production-grade UI generation
-  if ! claude plugin list 2>/dev/null | grep -q "frontend-design"; then
+  if ! echo "$PLUGIN_LIST" | grep -q "frontend-design"; then
     echo ""
     info "Installing frontend-design plugin..."
-    if claude plugin install frontend-design 2>/dev/null; then
+    if claude plugin install frontend-design --yes 2>/dev/null; then
       success "Frontend-design plugin installed"
     else
       warn "Frontend-design install failed — run manually: claude plugin install frontend-design"
     fi
   else
-    info "Frontend-design plugin already installed — skipping"
+    info "Frontend-design already installed — skipping"
   fi
 
   # Playwright — browser automation and E2E testing
-  if ! claude plugin list 2>/dev/null | grep -q "playwright"; then
+  if ! echo "$PLUGIN_LIST" | grep -q "playwright"; then
     echo ""
     info "Installing Playwright plugin..."
-    if claude plugin install playwright 2>/dev/null; then
+    if claude plugin install playwright --yes 2>/dev/null; then
       success "Playwright plugin installed"
     else
       warn "Playwright install failed — run manually: claude plugin install playwright"
     fi
   else
-    info "Playwright plugin already installed — skipping"
+    info "Playwright already installed — skipping"
   fi
 
   # Feature-dev — guided feature development workflows
-  if ! claude plugin list 2>/dev/null | grep -q "feature-dev"; then
+  if ! echo "$PLUGIN_LIST" | grep -q "feature-dev"; then
     echo ""
     info "Installing feature-dev plugin..."
-    if claude plugin install feature-dev 2>/dev/null; then
+    if claude plugin install feature-dev --yes 2>/dev/null; then
       success "Feature-dev plugin installed"
     else
       warn "Feature-dev install failed — run manually: claude plugin install feature-dev"
     fi
   else
-    info "Feature-dev plugin already installed — skipping"
+    info "Feature-dev already installed — skipping"
   fi
 fi
 
