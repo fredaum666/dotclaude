@@ -242,9 +242,10 @@ fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 
-# ── Superpowers plugin ───────────────────────────────────────────────────────
+# ── Plugins ───────────────────────────────────────────────────────────────────
 
 if command -v claude >/dev/null 2>&1; then
+  # Superpowers — structured workflows (brainstorming, TDD, debugging, planning)
   if ! claude mcp list 2>/dev/null | grep -q "superpowers"; then
     echo ""
     info "Installing superpowers plugin..."
@@ -255,6 +256,19 @@ if command -v claude >/dev/null 2>&1; then
     fi
   else
     info "Superpowers plugin already installed — skipping"
+  fi
+
+  # Frontend-design — production-grade UI generation
+  if ! claude plugin list 2>/dev/null | grep -q "frontend-design"; then
+    echo ""
+    info "Installing frontend-design plugin..."
+    if claude plugin install frontend-design 2>/dev/null; then
+      success "Frontend-design plugin installed"
+    else
+      warn "Frontend-design install failed — install manually in Claude Code: claude plugin install frontend-design"
+    fi
+  else
+    info "Frontend-design plugin already installed — skipping"
   fi
 fi
 
