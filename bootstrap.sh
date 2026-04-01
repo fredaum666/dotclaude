@@ -265,10 +265,36 @@ if command -v claude >/dev/null 2>&1; then
     if claude plugin install frontend-design 2>/dev/null; then
       success "Frontend-design plugin installed"
     else
-      warn "Frontend-design install failed — install manually in Claude Code: claude plugin install frontend-design"
+      warn "Frontend-design install failed — run manually: claude plugin install frontend-design"
     fi
   else
     info "Frontend-design plugin already installed — skipping"
+  fi
+
+  # Playwright — browser automation and E2E testing
+  if ! claude plugin list 2>/dev/null | grep -q "playwright"; then
+    echo ""
+    info "Installing Playwright plugin..."
+    if claude plugin install playwright 2>/dev/null; then
+      success "Playwright plugin installed"
+    else
+      warn "Playwright install failed — run manually: claude plugin install playwright"
+    fi
+  else
+    info "Playwright plugin already installed — skipping"
+  fi
+
+  # Feature-dev — guided feature development workflows
+  if ! claude plugin list 2>/dev/null | grep -q "feature-dev"; then
+    echo ""
+    info "Installing feature-dev plugin..."
+    if claude plugin install feature-dev 2>/dev/null; then
+      success "Feature-dev plugin installed"
+    else
+      warn "Feature-dev install failed — run manually: claude plugin install feature-dev"
+    fi
+  else
+    info "Feature-dev plugin already installed — skipping"
   fi
 fi
 
