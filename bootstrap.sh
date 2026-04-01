@@ -163,6 +163,27 @@ else
   fi
 fi
 
+# ── Commit first ─────────────────────────────────────────────────────────────
+
+if [ "$MODE" = "clone" ]; then
+  # Remove inner README files that waste tokens at runtime
+  find .claude -name "README.md" -delete 2>/dev/null || true
+
+  for _f in .claude/ CLAUDE.md CLAUDE.local.md.example settings.json bootstrap.sh update.sh .gitignore; do
+    [ -e "$_f" ] && git add "$_f"
+  done
+  git commit --quiet -m "chore: initialize project from dotclaude"
+
+elif [ "$MODE" = "init" ]; then
+  git add .claude/ CLAUDE.md bootstrap.sh update.sh .gitignore 2>/dev/null || true
+  [ -f "CLAUDE.local.md.example" ] && git add CLAUDE.local.md.example 2>/dev/null || true
+  if ! git diff --cached --quiet 2>/dev/null; then
+    git commit --quiet -m "chore: add dotclaude config"
+  else
+    info "Nothing new to commit — config files already present."
+  fi
+fi
+
 # ── GitHub remote setup (both modes) ─────────────────────────────────────────
 
 echo ""
@@ -199,7 +220,7 @@ case "$GH_CHOICE" in
         *) VISIBILITY="--private" ;;
       esac
 
-      gh repo create "$REPO_NAME" "$VISIBILITY" --source=. --remote=origin --push
+      gh repo create "$REPO_NAME" $VISIBILITY --source=. --remote=origin --push
       success "Created GitHub repo and pushed"
       GH_PUSHED=1
     fi
@@ -209,38 +230,13 @@ case "$GH_CHOICE" in
     ;;
 esac
 
-# ── Commit and push ───────────────────────────────────────────────────────────
+# ── Push if not already pushed ────────────────────────────────────────────────
 
-if [ "$MODE" = "clone" ]; then
-  # Remove inner README files that waste tokens at runtime
-  find .claude -name "README.md" -delete 2>/dev/null || true
-
-  # Stage only files we know exist — no fallback to git add -A
-  for _f in .claude/ CLAUDE.md CLAUDE.local.md.example settings.json bootstrap.sh update.sh .gitignore; do
-    [ -e "$_f" ] && git add "$_f"
-  done
-  git commit --quiet -m "chore: initialize project from dotclaude"
-
-  if git remote get-url origin >/dev/null 2>&1 && [ "$GH_PUSHED" -eq 0 ]; then
-    git push -u origin main --quiet
+if git remote get-url origin >/dev/null 2>&1 && [ "$GH_PUSHED" -eq 0 ]; then
+  if git push -u origin main --quiet 2>/dev/null || git push -u origin HEAD --quiet 2>/dev/null; then
     success "Pushed to origin"
-  fi
-
-elif [ "$MODE" = "init" ]; then
-  git add .claude/ CLAUDE.md bootstrap.sh update.sh .gitignore 2>/dev/null || true
-  [ -f "CLAUDE.local.md.example" ] && git add CLAUDE.local.md.example 2>/dev/null || true
-  if ! git diff --cached --quiet 2>/dev/null; then
-    git commit --quiet -m "chore: add dotclaude config"
   else
-    info "Nothing new to commit — config files already present."
-  fi
-
-  if git remote get-url origin >/dev/null 2>&1 && [ "$GH_PUSHED" -eq 0 ]; then
-    if git push -u origin main --quiet 2>/dev/null || git push -u origin HEAD --quiet; then
-      success "Pushed to origin"
-    else
-      warn "Push failed — check your remote URL and credentials, then push manually."
-    fi
+    warn "Push failed — check your remote URL and credentials, then push manually."
   fi
 fi
 
