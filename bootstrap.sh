@@ -242,6 +242,44 @@ fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 
+# ── Sound notifications (macOS only) ─────────────────────────────────────────
+
+if command -v afplay >/dev/null 2>&1; then
+  LOCAL_SETTINGS=".claude/settings.local.json"
+  if [ ! -f "$LOCAL_SETTINGS" ]; then
+    mkdir -p .claude
+    cat > "$LOCAL_SETTINGS" <<'EOF'
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Funk.aiff"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Purr.aiff"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+    success "Sound notifications configured (macOS)"
+  else
+    info "settings.local.json already exists — skipping sound setup"
+  fi
+fi
+
 # ── Plugins ───────────────────────────────────────────────────────────────────
 
 if command -v claude >/dev/null 2>&1; then
