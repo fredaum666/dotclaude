@@ -284,16 +284,15 @@ fi
 
 if command -v claude >/dev/null 2>&1; then
   PLUGIN_LIST=$(claude plugin list 2>/dev/null || true)
-  MCP_LIST=$(claude mcp list 2>/dev/null || true)
 
   # Superpowers — structured workflows (brainstorming, TDD, debugging, planning)
-  if ! echo "$MCP_LIST" | grep -q "superpowers"; then
+  if ! echo "$PLUGIN_LIST" | grep -q "superpowers"; then
     echo ""
     info "Installing superpowers plugin..."
-    if claude mcp add superpowers --yes -- npx -y claude-superpowers@latest 2>/dev/null; then
+    if claude plugin install superpowers 2>/dev/null; then
       success "Superpowers plugin installed"
     else
-      warn "Superpowers install failed — run manually: claude mcp add superpowers -- npx -y claude-superpowers@latest"
+      warn "Superpowers install failed — run manually: claude plugin install superpowers"
     fi
   else
     info "Superpowers already installed — skipping"
@@ -303,7 +302,7 @@ if command -v claude >/dev/null 2>&1; then
   if ! echo "$PLUGIN_LIST" | grep -q "frontend-design"; then
     echo ""
     info "Installing frontend-design plugin..."
-    if claude plugin install frontend-design --yes 2>/dev/null; then
+    if claude plugin install frontend-design 2>/dev/null; then
       success "Frontend-design plugin installed"
     else
       warn "Frontend-design install failed — run manually: claude plugin install frontend-design"
@@ -316,7 +315,7 @@ if command -v claude >/dev/null 2>&1; then
   if ! echo "$PLUGIN_LIST" | grep -q "playwright"; then
     echo ""
     info "Installing Playwright plugin..."
-    if claude plugin install playwright --yes 2>/dev/null; then
+    if claude plugin install playwright 2>/dev/null; then
       success "Playwright plugin installed"
     else
       warn "Playwright install failed — run manually: claude plugin install playwright"
@@ -329,7 +328,7 @@ if command -v claude >/dev/null 2>&1; then
   if ! echo "$PLUGIN_LIST" | grep -q "feature-dev"; then
     echo ""
     info "Installing feature-dev plugin..."
-    if claude plugin install feature-dev --yes 2>/dev/null; then
+    if claude plugin install feature-dev 2>/dev/null; then
       success "Feature-dev plugin installed"
     else
       warn "Feature-dev install failed — run manually: claude plugin install feature-dev"
