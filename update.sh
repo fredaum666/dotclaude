@@ -15,7 +15,7 @@ set -euo pipefail
 
 UPSTREAM_REMOTE="upstream"
 UPSTREAM_BRANCH="main"
-MERGE_PATHS=(".claude/" "bootstrap.sh" "update.sh")
+MERGE_PATHS=(".claude/" "bootstrap.sh" "update.sh" "settings.json")
 
 # ── Preflight ────────────────────────────────────────────────────────────────
 
@@ -108,6 +108,12 @@ echo "Applying changes..."
 for path in "${MERGE_PATHS[@]}"; do
   git checkout "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH" -- "$path" || true
 done
+
+# In init-mode projects, settings.json lives at .claude/settings.json — copy it there
+if [ -f ".claude/settings.json" ] && [ -f "settings.json" ]; then
+  cp settings.json .claude/settings.json
+  git add .claude/settings.json 2>/dev/null || true
+fi
 
 # Make hooks executable
 find .claude/hooks -maxdepth 1 -name '*.sh' -exec chmod +x {} + 2>/dev/null || true
