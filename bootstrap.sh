@@ -338,6 +338,64 @@ if command -v claude >/dev/null 2>&1; then
   fi
 fi
 
+# ── Community skills (skills.sh) ──────────────────────────────────────────────
+# Installed into .claude/skills/ via `npx skills add`. Add more entries to SKILLS_SH.
+# Format: "<owner/repo>|<skill names, space-separated, or * for all>|<marker dir>"
+# The marker dir (under .claude/skills/) is used to skip reinstalls; it defaults
+# to the first skill name and is required when installing all (*).
+
+SKILLS_SH=(
+  "Leonxlnx/taste-skill|design-taste-frontend"      # anti-generic frontend design taste
+  "emilkowalski/skill|*|emil-design-eng"            # design-engineering: animation, UI polish, prototyping
+)
+
+if command -v npx >/dev/null 2>&1; then
+  for entry in "${SKILLS_SH[@]}"; do
+    IFS='|' read -r repo skills marker <<< "$entry"
+    marker="${marker:-${skills%% *}}"
+    if [ "$marker" = "*" ]; then
+      warn "Skipping $repo — entries installing all skills (*) need a marker dir"
+      continue
+    fi
+    if [ -e ".claude/skills/$marker" ]; then
+      info "Skills from $repo already installed — skipping"
+      continue
+    fi
+    skill_args=()
+    if [ "$skills" != "*" ]; then
+      for s in $skills; do skill_args+=(--skill "$s"); done
+    fi
+    echo ""
+    info "Installing skills from $repo ($skills)..."
+    if npx -y skills add "$repo" ${skill_args[@]+"${skill_args[@]}"} --agent claude-code -y >/dev/null 2>&1; then
+      success "Skills from $repo installed"
+    else
+      warn "Install from $repo failed — run manually: npx skills add $repo ${skill_args[*]+"${skill_args[*]}"}"
+    fi
+  done
+else
+  warn "npx not found — skipping community skills. Install Node.js, then run: npx skills add <owner/repo> for each entry in SKILLS_SH"
+fi
+
+# ── Impeccable ────────────────────────────────────────────────────────────────
+# Frontend design skill + edit hooks (https://impeccable.style). Installs into
+# .claude/skills/impeccable and merges its hooks into .claude/settings.local.json.
+# After install, run `/impeccable init` inside Claude Code to set up design context.
+
+if command -v npx >/dev/null 2>&1; then
+  if [ -e ".claude/skills/impeccable" ]; then
+    info "Impeccable already installed — skipping"
+  else
+    echo ""
+    info "Installing impeccable..."
+    if npx -y impeccable install -y --providers=claude --scope=project >/dev/null 2>&1; then
+      success "Impeccable installed"
+    else
+      warn "Impeccable install failed — run manually: npx impeccable install -y --providers=claude --scope=project"
+    fi
+  fi
+fi
+
 echo ""
 echo "────────────────────────────────────────────"
 success "Bootstrap complete!"
@@ -347,10 +405,12 @@ if [ "$MODE" = "clone" ]; then
   echo "  1. cd '$PROJECT_NAME'"
   echo "  2. Add your first code"
   echo "  3. Open Claude Code and run: /setupdotclaude"
+  echo "  4. Then run: /impeccable init  (sets up design context)"
 else
   echo "  Next steps:"
   echo "  1. Add your first code (or continue where you left off)"
   echo "  2. Open Claude Code and run: /setupdotclaude"
+  echo "  3. Then run: /impeccable init  (sets up design context)"
 fi
 echo ""
 echo "  To pull future dotclaude config updates: bash update.sh"

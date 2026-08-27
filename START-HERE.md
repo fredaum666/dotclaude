@@ -33,5 +33,7 @@ Bootstrap handles everything:
 - `upstream` remote → dotclaude (for future updates)
 - GitHub repo creation or connection
 - Plugins: superpowers, frontend-design, playwright, feature-dev
+- Community skills (via `npx skills add`): design-taste-frontend from [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), and all design-engineering skills from [emilkowalski/skill](https://github.com/emilkowalski/skill)
+- [Impeccable](https://impeccable.style) design skill + hooks (`npx impeccable install`)
 
-Once done, open Claude Code and run `/setupdotclaude` to tailor the config to your stack.
+Once done, open Claude Code and run `/setupdotclaude` to tailor the config to your stack, then `/impeccable init` to set up design context.
