@@ -12,6 +12,11 @@ Rules are modular instruction files that Claude loads automatically. They extend
 
 Principles (single-responsibility, no premature abstraction, composition over inheritance), naming conventions (files, variables, functions, constants), comment guidelines, code markers (TODO/FIXME/HACK/NOTE), and file organization (import order, export patterns, function ordering).
 
+### skills.md
+**Scope**: Always
+
+When and why to use every installed skill, agent, and plugin — proactively, without being asked. Managed by dotclaude and overwritten by `update.sh`; don't edit it in your project.
+
 ### testing.md
 **Scope**: Always
 

@@ -5,6 +5,7 @@
 #   Init mode  — run from inside an existing git repo: adds .claude/ config to it
 # Usage: bash bootstrap.sh
 #        curl -fsSL https://raw.githubusercontent.com/fredaum666/dotclaude/main/bootstrap.sh | bash
+#        bash bootstrap.sh --install-only   # only (re)install plugins + community skills; used by update.sh
 
 set -euo pipefail
 
@@ -34,6 +35,12 @@ confirm() {
 
 command -v git >/dev/null 2>&1 || abort "git is not installed."
 command -v jq  >/dev/null 2>&1 || warn "jq is not installed — hooks will fail. Install it: brew install jq (macOS) or apt install jq (Linux)"
+
+INSTALL_ONLY=0
+MODE=""
+[ "${1:-}" = "--install-only" ] && INSTALL_ONLY=1
+
+if [ "$INSTALL_ONLY" -eq 0 ]; then
 
 # ── Detect mode ───────────────────────────────────────────────────────────────
 
@@ -240,7 +247,7 @@ if git remote get-url origin >/dev/null 2>&1 && [ "$GH_PUSHED" -eq 0 ]; then
   fi
 fi
 
-# ── Done ──────────────────────────────────────────────────────────────────────
+fi  # INSTALL_ONLY
 
 # ── Sound notifications (macOS only) ─────────────────────────────────────────
 
@@ -398,6 +405,13 @@ fi
 
 echo ""
 echo "────────────────────────────────────────────"
+if [ "$INSTALL_ONLY" -eq 1 ]; then
+  success "Plugins and skills up to date."
+  echo ""
+  echo "  If impeccable was just installed, open Claude Code and run: /impeccable init"
+  echo ""
+  exit 0
+fi
 success "Bootstrap complete!"
 echo ""
 if [ "$MODE" = "clone" ]; then

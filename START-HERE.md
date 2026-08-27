@@ -26,6 +26,8 @@ cd your-project
 bash update.sh
 ```
 
+Adds new rules/skills/agents, keeps files you customized, never touches `CLAUDE.md`, then offers to install new plugins and community skills. If your `update.sh` predates Aug 2026 and exits silently after `y`, fetch the fixed copy first: `git fetch upstream main && git checkout upstream/main -- update.sh bootstrap.sh`
+
 ---
 
 Bootstrap handles everything:

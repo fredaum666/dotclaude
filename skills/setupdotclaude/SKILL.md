@@ -77,7 +77,7 @@ Replace the template commands with actual commands from the detected manifest:
 
 Remove sections that don't apply (e.g., Architecture section for a single-file utility).
 
-**Preserve the `## Skills & Agents — Use Proactively` and `## Maintaining This File` sections.** They tell Claude which installed skills/agents to use without being asked. Only prune table rows for skills that cannot apply to this stack (e.g. `animate-expo` in a web-only app, `write-swift` when there is no Swift) and rows for skills that are not actually installed under `.claude/skills/` or as plugins. If the project adds its own skills or agents, add rows for them.
+**Preserve the `## Maintaining This File` section.** Do not edit `.claude/rules/skills.md` — it is managed by dotclaude and overwritten by `update.sh`. If the project adds its own skills or agents, document when to use them in `CLAUDE.md` (or a new rule file), not in `skills.md`.
 
 ### 3.2 — settings.json
 
@@ -156,7 +156,7 @@ After all changes are applied, run a thorough final review pass.
 
 Strip any remaining `> REPLACE:` placeholder blocks from `CLAUDE.md` — these are template guidance that should have been replaced with real content or removed during Phase 3.1.
 
-Confirm `CLAUDE.md` still contains the `## Skills & Agents — Use Proactively` and `## Maintaining This File` sections, and that every skill referenced there exists (`.claude/skills/<name>/SKILL.md` or an installed plugin). If `/impeccable init` has not been run yet (no impeccable design context in the repo), remind the user to run it.
+Confirm `CLAUDE.md` still contains the `## Maintaining This File` section and `.claude/rules/skills.md` is present with `alwaysApply: true`. If skills referenced in `skills.md` are missing from `.claude/skills/` or as plugins, tell the user to run `bash bootstrap.sh --install-only`. If `/impeccable init` has not been run yet (no impeccable design context in the repo), remind the user to run it.
 
 Review the entire codebase alongside the customized `.claude/` configuration:
 - Do the rules match how the code is actually written?

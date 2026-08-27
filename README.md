@@ -112,7 +112,13 @@ When security fixes or new features land in dotclaude, propagate them to any pro
 bash update.sh
 ```
 
-This fetches and merges only `.claude/`, `bootstrap.sh`, and `update.sh` from `upstream`. Review the diff, then commit if everything looks good.
+This fetches `rules/`, `skills/`, `agents/`, `hooks/`, `bootstrap.sh`, `update.sh`, and `settings.json` from `upstream`. New files are added; files you customized are left alone and listed for manual merge; only dotclaude-managed files (`rules/skills.md`, `skills/setupdotclaude/`) are overwritten. Your `CLAUDE.md` is never touched. It then offers to install any new plugins and community skills (`bash bootstrap.sh --install-only`). Review the diff, then commit if everything looks good.
+
+> **Projects bootstrapped before Aug 2026:** the old `update.sh` exits silently right after you answer `y` (a `pipefail`/`grep` bug). Fetch the fixed scripts once, then run it normally:
+>
+> ```bash
+> git fetch upstream main && git checkout upstream/main -- update.sh bootstrap.sh && bash update.sh
+> ```
 
 ---
 
@@ -145,7 +151,7 @@ The defaults are solid foundations. Your edits on top are what make Claude effec
 
 ## Skills (Slash Commands)
 
-Skills are invoked with `/name` in your Claude Code session. All skills except `/test-writer` are manual-only — you invoke them explicitly.
+Skills are invoked with `/name` in your Claude Code session. `rules/skills.md` (always loaded) tells Claude when to use each skill, agent, and plugin proactively, so you rarely need to invoke them by hand.
 
 | Command | Arguments | Description |
 |---------|-----------|-------------|
