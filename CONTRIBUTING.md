@@ -94,6 +94,3 @@ If your change adds or removes a file, update the structure tree in `README.md` 
    - **Body**: why it's useful, what daily workflow it improves
    - **Testing**: how you verified it works
 
-## Code of Conduct
-
-Be helpful, be kind, be constructive. We're all here to make Claude Code better for daily development work.
