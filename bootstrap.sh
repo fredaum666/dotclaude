@@ -403,12 +403,32 @@ if command -v npx >/dev/null 2>&1; then
   fi
 fi
 
+# ── Context7 ──────────────────────────────────────────────────────────────────
+# Live library documentation via MCP (https://context7.com). Writes .mcp.json,
+# .claude/rules/context7.md and .claude/skills/context7-mcp/. Uses the OAuth
+# endpoint so no login is needed here — Claude Code prompts on first use (/mcp).
+
+if command -v npx >/dev/null 2>&1; then
+  if [ -e ".claude/skills/context7-mcp" ]; then
+    info "Context7 already installed — skipping"
+  else
+    echo ""
+    info "Installing Context7 MCP..."
+    if npx -y ctx7 setup --claude --project --oauth --yes >/dev/null 2>&1; then
+      success "Context7 installed"
+    else
+      warn "Context7 install failed — run manually: npx ctx7 setup --claude --project --oauth --yes"
+    fi
+  fi
+fi
+
 echo ""
 echo "────────────────────────────────────────────"
 if [ "$INSTALL_ONLY" -eq 1 ]; then
   success "Plugins and skills up to date."
   echo ""
   echo "  If impeccable was just installed, open Claude Code and run: /impeccable init"
+  echo "  If Context7 was just installed, run /mcp in Claude Code to sign in"
   echo ""
   exit 0
 fi
@@ -420,11 +440,13 @@ if [ "$MODE" = "clone" ]; then
   echo "  2. Add your first code"
   echo "  3. Open Claude Code and run: /setupdotclaude"
   echo "  4. Then run: /impeccable init  (sets up design context)"
+  echo "  5. Run /mcp and sign in to Context7 (live library docs)"
 else
   echo "  Next steps:"
   echo "  1. Add your first code (or continue where you left off)"
   echo "  2. Open Claude Code and run: /setupdotclaude"
   echo "  3. Then run: /impeccable init  (sets up design context)"
+  echo "  4. Run /mcp and sign in to Context7 (live library docs)"
 fi
 echo ""
 echo "  To pull future dotclaude config updates: bash update.sh"

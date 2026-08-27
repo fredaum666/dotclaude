@@ -66,6 +66,19 @@ Delegate to these (in parallel where possible) before merging, or whenever the c
 - `doc-reviewer` — when docs or public APIs change
 - `frontend-designer` — when building UI (see Design & frontend)
 
+## Library documentation (Context7 MCP)
+
+Use the `context7` MCP tools for **any** question about a library, framework, SDK, API, CLI, or cloud service — even ones you know well. Training data goes stale; fetched docs don't. Prefer this over web search for docs.
+
+| Situation | Use | Why |
+|---|---|---|
+| Writing code against a library API, config, or CLI (React, Next.js, Prisma, Supabase, Tailwind, …) | `resolve-library-id` → `query-docs` (or `/context7-mcp`) | Current syntax and options instead of remembered ones; avoids deprecated APIs |
+| Version migration or "why doesn't this work in vX" | `query-docs` with the version-specific library ID | Migration notes and breaking changes are exactly what training data misses |
+| Debugging a library-specific error | `query-docs` scoped to the error's concept | Docs often name the misconfiguration directly |
+| Choosing between two libraries' approaches | `query-docs` on each | Compare from real docs, not impressions |
+
+Not for: refactoring, business-logic bugs, code review, or general programming concepts — those don't need docs. If the `context7` server isn't connected, tell the user to run `/mcp` and sign in.
+
 ## Tooling plugins
 
 - **playwright** — use the browser tools to verify UI changes actually render and behave; screenshot before claiming a visual fix works

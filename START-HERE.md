@@ -37,5 +37,6 @@ Bootstrap handles everything:
 - Plugins: superpowers, frontend-design, playwright, feature-dev
 - Community skills (via `npx skills add`): design-taste-frontend from [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), and all design-engineering skills from [emilkowalski/skill](https://github.com/emilkowalski/skill)
 - [Impeccable](https://impeccable.style) design skill + hooks (`npx impeccable install`)
+- [Context7](https://context7.com) MCP for live library docs (`npx ctx7 setup`) — sign in once via `/mcp`
 
 Once done, open Claude Code and run `/setupdotclaude` to tailor the config to your stack, then `/impeccable init` to set up design context.
