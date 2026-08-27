@@ -146,9 +146,6 @@ else
     info "Copied update.sh"
   fi
 
-  # Copy CLAUDE.local.md.example
-  [ ! -f "CLAUDE.local.md.example" ] && cp "$TMP_DIR/dotclaude/CLAUDE.local.md.example" "./CLAUDE.local.md.example"
-
   find .claude/hooks -maxdepth 1 -name '*.sh' -exec chmod +x {} + 2>/dev/null || true
   chmod +x bootstrap.sh update.sh 2>/dev/null || true
 
@@ -176,14 +173,13 @@ if [ "$MODE" = "clone" ]; then
   # Remove inner README files that waste tokens at runtime
   find .claude -name "README.md" -delete 2>/dev/null || true
 
-  for _f in .claude/ CLAUDE.md CLAUDE.local.md.example settings.json bootstrap.sh update.sh .gitignore; do
+  for _f in .claude/ CLAUDE.md settings.json bootstrap.sh update.sh .gitignore; do
     [ -e "$_f" ] && git add "$_f"
   done
   git commit --quiet -m "chore: initialize project from dotclaude"
 
 elif [ "$MODE" = "init" ]; then
   git add .claude/ CLAUDE.md bootstrap.sh update.sh .gitignore 2>/dev/null || true
-  [ -f "CLAUDE.local.md.example" ] && git add CLAUDE.local.md.example 2>/dev/null || true
   if ! git diff --cached --quiet 2>/dev/null; then
     git commit --quiet -m "chore: add dotclaude config"
   else

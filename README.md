@@ -205,7 +205,7 @@ Agents run in isolated context — they don't see your conversation history, but
 | Add a specialist reviewer | Create `.claude/agents/your-agent.md` |
 | Enforce behavior deterministically | Add a hook in `settings.json` |
 | Override settings locally | Copy `settings.local.json.example` → `.claude/settings.local.json` |
-| Personal CLAUDE.md overrides | Rename `CLAUDE.local.md.example` → `CLAUDE.local.md` |
+| Personal CLAUDE.md overrides | Create `CLAUDE.local.md` (gitignored) |
 
 ### Example: Project-specific rule
 
@@ -229,7 +229,6 @@ paths:
 ```
 dotclaude/
 ├── CLAUDE.md                           # Template project instructions → copy to YOUR project root
-├── CLAUDE.local.md.example             # Personal overrides template → copy and rename to CLAUDE.local.md
 ├── settings.json                       # Project settings → copy to .claude/
 ├── settings.local.json.example         # Personal settings template → copy to .claude/settings.local.json
 ├── .gitignore                          # Gitignore for .claude/ directory
